@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import static com.epam.engx.cleancode.naming.task3.HarshadTestHelper.getHarshadNumbers;
 
-public class HarshadTest {
+public class HarshadNumberTest {
     @Test
     public void shouldPrintAllHarshadNumbers() {
         Assert.assertEquals(

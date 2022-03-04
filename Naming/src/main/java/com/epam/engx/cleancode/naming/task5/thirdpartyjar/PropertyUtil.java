@@ -29,11 +29,11 @@ public class PropertyUtil {
     }
 
     private static void loadPropertiesFileFromClassLoader(ClassLoader classLoader, Properties props) {
-        try (InputStream is = classLoader.getResourceAsStream(CONFIG_FILE_NAME)) {
-            if (is == null) {
+        try (InputStream isConfigFile = classLoader.getResourceAsStream(CONFIG_FILE_NAME)) {
+            if (isConfigFile == null) {
                 throw new MissingConfigFileException("Missing properties file...");
             }
-            props.load(is);
+            props.load(isConfigFile);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error occurred while loading properties file", e);
         }
