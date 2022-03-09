@@ -15,20 +15,20 @@ public final class FileManager {
     private static final String[] TYPES = {"jpg", "png"};
     private static final String[] TYPES2 = {"pdf", "doc"};
 
-    private String bp = PropertyUtil.loadProperty("basePath");
+    private String basePath = PropertyUtil.loadProperty("basePath");
 
     public File retrieveFile(String fileName) {
         validateFileType(fileName);
-        final String dirPath = bp + File.separator;
+        final String dirPath = basePath + File.separator;
         return Paths.get(dirPath, fileName).toFile();
     }
 
     public List<String> listAllImages() {
-        return files(bp, TYPES);
+        return files(basePath, TYPES);
     }
 
     public List<String> listAllDocumentFiles() {
-        return files(bp, TYPES2);
+        return files(basePath, TYPES2);
     }
 
     private void validateFileType(String fileName) {
@@ -43,12 +43,12 @@ public final class FileManager {
 
     private boolean isInvalidImage(String fileName) {
         FileExtPred imageExtensionsPredicate = new FileExtPred(TYPES);
-        return !imageExtensionsPredicate.test(fileName);
+        return !imageExtensionsPredicate.isExtension(fileName);
     }
 
     private boolean isInvalidDocument(String fileName) {
         FileExtPred documentExtensionsPredicate = new FileExtPred(TYPES2);
-        return !documentExtensionsPredicate.test(fileName);
+        return !documentExtensionsPredicate.isExtension(fileName);
     }
 
     private List<String> files(String directoryPath, String[] allowedExtensions) {
@@ -60,7 +60,7 @@ public final class FileManager {
         return new FilenameFilter() {
             @Override
             public boolean accept(File dir, String str) {
-                return pred.test(str);
+                return pred.isExtension(str);
             }
         };
     }
