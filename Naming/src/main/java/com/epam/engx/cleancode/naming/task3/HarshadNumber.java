@@ -7,7 +7,11 @@ public class HarshadNumber {
 		StringBuilder result = new StringBuilder();
 		long limit = 200; // limit the seq of Harshad numbers
 		for (int i = 1; i <= limit; i++) {
-			if (i % findSumOfDigits(i) == 0) {
+			int sum = findSumOfDigits(i);
+			if (sum == 0){
+				continue;
+			}
+			if (i % sum == 0) {
 				result.append(i).append("\n");
 			}
 		}

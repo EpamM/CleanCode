@@ -4,31 +4,34 @@ import com.epam.engx.cleancode.comments.task1.thirdpartyjar.InvalidInputExceptio
 
 public class MortgageInstallmentCalculator {
 
+    private MortgageInstallmentCalculator() {
+        throw new IllegalStateException("MortgageInstallmentCalculator class");
+    }
+
     /**
+     * get monthly payment amount
      *
-     * @param p principal amount
-     * @param t term of mortgage in years
-     * @param r rate of interest
+     * @param principalAmount principal amount
+     * @param termofMortgage term of mortgage in years
+     * @param rateOfInterest rate of interest
      * @return monthly payment amount
      */
-    public static double calculateMonthlyPayment(int p, int t, double r) {
+    public static double calculateMonthlyPayment(int principalAmount, int termofMortgage, double rateOfInterest) {
 
-        if (p < 0 || t <= 0 || r < 0) {
+        if (principalAmount < 0 || termofMortgage <= 0 || rateOfInterest < 0) {
             throw new InvalidInputException("Negative values are not allowed");
         }
 
-        r /= 100.0;
+        rateOfInterest /= 100.0;
 
-        double tim = t * 12;
+        double tim = (double) termofMortgage * 12;
 
-        if(r==0)
-            return  p/tim;
+        if(rateOfInterest==0)
+            return  principalAmount/tim;
 
-        double m = r / 12.0;
+        double monthRateOfInterest = rateOfInterest / 12.0;
 
         // The Math.pow() method is used calculate values raised to a power
-        double monthlyPayment = (p * m) / (1 - Math.pow(1 + m, -tim));
-
-        return monthlyPayment;
+        return (principalAmount * monthRateOfInterest) / (1 - Math.pow(1 + monthRateOfInterest, -tim));
     }
 }

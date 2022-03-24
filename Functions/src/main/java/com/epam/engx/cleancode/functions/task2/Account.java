@@ -6,6 +6,8 @@ import com.epam.engx.cleancode.functions.task2.thirdpartyjar.NotActivUserExcepti
 import com.epam.engx.cleancode.functions.task2.thirdpartyjar.Review;
 import com.epam.engx.cleancode.functions.task2.thirdpartyjar.User;
 
+import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 public abstract class Account implements User {
@@ -29,7 +31,8 @@ public abstract class Account implements User {
     }
 
     private Level getLevelByReviews(int reviewAnswers) {
-        for (Integer threshold : levelMap.keySet()) {
+        for (Map.Entry<Integer, Level> entry : levelMap.entrySet()) {
+            int threshold = entry.getKey();
             if (reviewAnswers >= threshold)
                 return levelMap.get(threshold);
         }
@@ -37,7 +40,7 @@ public abstract class Account implements User {
         return Level.defaultLevel();
     }
 
-    public void setLevelMap(TreeMap<Integer, Level> levelMap) {
-        this.levelMap = levelMap;
+    public void setLevelMap(SortedMap<Integer, Level> levelMap) {
+        this.levelMap = (TreeMap<Integer, Level>) levelMap;
     }
 }

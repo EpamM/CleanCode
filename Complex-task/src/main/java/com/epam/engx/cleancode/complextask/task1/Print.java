@@ -1,7 +1,6 @@
 package com.epam.engx.cleancode.complextask.task1;
 
 
-
 import com.epam.engx.cleancode.complextask.task1.thirdpartyjar.Command;
 import com.epam.engx.cleancode.complextask.task1.thirdpartyjar.DataSet;
 import com.epam.engx.cleancode.complextask.task1.thirdpartyjar.View;
@@ -47,36 +46,34 @@ public class Print implements Command {
 
     private String getEmptyTable(String tableName) {
         String textEmptyTable = "║ Table '" + tableName + "' is empty or does not exist ║";
-        String result = "╔";
-        for (int i = 0; i < textEmptyTable.length() - 2; i++) {
-            result += "═";
+        StringBuilder resultBld = new StringBuilder("╔");
+        for (int i = 0; i < textEmptyTable.length() - 2; ++i) {
+            resultBld.append("═");
         }
-        result += "╗\n";
-        result += textEmptyTable + "\n";
-        result += "╚";
-        for (int i = 0; i < textEmptyTable.length() - 2; i++) {
-            result += "═";
-        }
-        result += "╝\n";
-        return result;
+        resultBld.append("╗\n");
+        resultBld.append(textEmptyTable + "\n");
+        resultBld.append("╚");
+        getMaxColumnData(resultBld, textEmptyTable.length() - 2, "═");
+        resultBld.append("╝\n");
+        return resultBld.toString();
     }
 
     private int getMaxColumnSize(List<DataSet> dataSets) {
         int maxLength = 0;
-        if (dataSets.size() > 0) {
-            List<String> columnNames = dataSets.get(0).getColumnNames();
-            for (String columnName : columnNames) {
-                if (columnName.length() > maxLength) {
-                    maxLength = columnName.length();
-                }
+        if (dataSets.isEmpty()) {
+            return maxLength;
+        }
+        List<String> columnNames = dataSets.get(0).getColumnNames();
+        for (String columnName : columnNames) {
+            if (columnName.length() > maxLength) {
+                maxLength = columnName.length();
             }
-            for (DataSet dataSet : dataSets) {
-                List<Object> values = dataSet.getValues();
-                for (Object value : values) {
-//                    if (value instanceof String)
-                        if (String.valueOf(value).length() > maxLength) {
-                            maxLength = String.valueOf(value).length();
-                        }
+        }
+        for (DataSet dataSet : dataSets) {
+            List<Object> values = dataSet.getValues();
+            for (Object value : values) {
+                if (String.valueOf(value).length() > maxLength) {
+                    maxLength = String.valueOf(value).length();
                 }
             }
         }
@@ -86,146 +83,117 @@ public class Print implements Command {
     private String getStringTableData(List<DataSet> dataSets) {
         int rowsCount;
         rowsCount = dataSets.size();
+        StringBuilder resultBld = new StringBuilder("");
         int maxColumnSize = getMaxColumnSize(dataSets);
-        String result = "";
+
         if (maxColumnSize % 2 == 0) {
             maxColumnSize += 2;
         } else {
             maxColumnSize += 3;
         }
         int columnCount = getColumnCount(dataSets);
+        getRowData(dataSets, rowsCount, resultBld, maxColumnSize, columnCount);
+        resultBld.append("╚");
+        getColumnData(resultBld, maxColumnSize, columnCount, "╩");
+        getMaxColumnData(resultBld, maxColumnSize, "═");
+        resultBld.append("╝\n");
+        return resultBld.toString();
+    }
+
+    private void getColumnData(StringBuilder resultBld, int maxColumnSize, int columnCount, String s) {
+        for (int j = 1; j < columnCount; j++) {
+            getMaxColumnData(resultBld, maxColumnSize, "═");
+            resultBld.append(s);
+        }
+    }
+
+    private void getMaxColumnData(StringBuilder resultBld, int maxColumnSize, String s) {
+        for (int i = 0; i < maxColumnSize; i++) {
+            resultBld.append(s);
+        }
+    }
+
+    private void getRowData(List<DataSet> dataSets, int rowsCount, StringBuilder resultBld, int maxColumnSize, int columnCount) {
         for (int row = 0; row < rowsCount; row++) {
             List<Object> values = dataSets.get(row).getValues();
-            result += "║";
+            resultBld.append("║");
             for (int column = 0; column < columnCount; column++) {
                 int valuesLength = String.valueOf(values.get(column)).length();
                 if (valuesLength % 2 == 0) {
-                    for (int j = 0; j < (maxColumnSize - valuesLength) / 2; j++) {
-                        result += " ";
-                    }
-                    result += String.valueOf(values.get(column));
-                    for (int j = 0; j < (maxColumnSize - valuesLength) / 2; j++) {
-                        result += " ";
-                    }
-                    result += "║";
+                    getMaxColumnData(resultBld, (maxColumnSize - valuesLength) / 2, " ");
+                    resultBld.append(String.valueOf(values.get(column)));
+                    getMaxColumnData(resultBld, (maxColumnSize - valuesLength) / 2, " ");
+                    resultBld.append("║");
                 } else {
-                    for (int j = 0; j < (maxColumnSize - valuesLength) / 2; j++) {
-                        result += " ";
-                    }
-                    result += String.valueOf(values.get(column));
+                    getMaxColumnData(resultBld, (maxColumnSize - valuesLength) / 2, " ");
+                    resultBld.append(String.valueOf(values.get(column)));
                     for (int j = 0; j <= (maxColumnSize - valuesLength) / 2; j++) {
-                        result += " ";
+                        resultBld.append(" ");
                     }
-                    result += "║";
+                    resultBld.append("║");
                 }
             }
-            result += "\n";
+            resultBld.append("\n");
             if (row < rowsCount - 1) {
-                result += "╠";
-                for (int j = 1; j < columnCount; j++) {
-                    for (int i = 0; i < maxColumnSize; i++) {
-                        result += "═";
-                    }
-                    result += "╬";
-                }
-                for (int i = 0; i < maxColumnSize; i++) {
-                    result += "═";
-                }
-                result += "╣\n";
+                resultBld.append("╠");
+                getColumnData(resultBld, maxColumnSize, columnCount, "╬");
+                getMaxColumnData(resultBld, maxColumnSize, "═");
+                resultBld.append("╣\n");
             }
         }
-        result += "╚";
-        for (int j = 1; j < columnCount; j++) {
-            for (int i = 0; i < maxColumnSize; i++) {
-                result += "═";
-            }
-            result += "╩";
-        }
-        for (int i = 0; i < maxColumnSize; i++) {
-            result += "═";
-        }
-        result += "╝\n";
-        return result;
     }
 
     private int getColumnCount(List<DataSet> dataSets) {
         int result = 0;
-        if (dataSets.size() > 0) {
-            return dataSets.get(0).getColumnNames().size();
+        if (dataSets.isEmpty()) {
+            return result;
         }
-        return result;
+        return dataSets.get(0).getColumnNames().size();
     }
 
     private String getHeaderOfTheTable(List<DataSet> dataSets) {
         int maxColumnSize = getMaxColumnSize(dataSets);
-        String result = "";
+        StringBuilder resultBld = new StringBuilder("");
         int columnCount = getColumnCount(dataSets);
         if (maxColumnSize % 2 == 0) {
             maxColumnSize += 2;
         } else {
             maxColumnSize += 3;
         }
-        result += "╔";
-        for (int j = 1; j < columnCount; j++) {
-            for (int i = 0; i < maxColumnSize; i++) {
-                result += "═";
-            }
-            result += "╦";
-        }
-        for (int i = 0; i < maxColumnSize; i++) {
-            result += "═";
-        }
-        result += "╗\n";
+        resultBld.append("╔");
+        getColumnData(resultBld, maxColumnSize, columnCount, "╦");
+        getMaxColumnData(resultBld, maxColumnSize, "═");
+        resultBld.append("╗\n");
         List<String> columnNames = dataSets.get(0).getColumnNames();
         for (int column = 0; column < columnCount; column++) {
-            result += "║";
+            resultBld.append("║");
             int columnNamesLength = columnNames.get(column).length();
             if (columnNamesLength % 2 == 0) {
-                for (int j = 0; j < (maxColumnSize - columnNamesLength) / 2; j++) {
-                    result += " ";
-                }
-                result += columnNames.get(column);
-                for (int j = 0; j < (maxColumnSize - columnNamesLength) / 2; j++) {
-                    result += " ";
-                }
+                getMaxColumnData(resultBld, (maxColumnSize - columnNamesLength) / 2, " ");
+                resultBld.append(columnNames.get(column));
+                getMaxColumnData(resultBld, (maxColumnSize - columnNamesLength) / 2, " ");
             } else {
-                for (int j = 0; j < (maxColumnSize - columnNamesLength) / 2; j++) {
-                    result += " ";
-                }
-                result += columnNames.get(column);
+                getMaxColumnData(resultBld, (maxColumnSize - columnNamesLength) / 2, " ");
+                resultBld.append(columnNames.get(column));
                 for (int j = 0; j <= (maxColumnSize - columnNamesLength) / 2; j++) {
-                    result += " ";
+                    resultBld.append(" ");
                 }
             }
         }
-        result += "║\n";
+        resultBld.append("║\n");
 
         //last string of the header
-        if (dataSets.size() > 0) {
-            result += "╠";
-            for (int j = 1; j < columnCount; j++) {
-                for (int i = 0; i < maxColumnSize; i++) {
-                    result += "═";
-                }
-                result += "╬";
-            }
-            for (int i = 0; i < maxColumnSize; i++) {
-                result += "═";
-            }
-            result += "╣\n";
+        if (dataSets.isEmpty()) {
+            resultBld.append("╚");
+            getColumnData(resultBld, maxColumnSize, columnCount, "╩");
+            getMaxColumnData(resultBld, maxColumnSize, "═");
+            resultBld.append("╝\n");
         } else {
-            result += "╚";
-            for (int j = 1; j < columnCount; j++) {
-                for (int i = 0; i < maxColumnSize; i++) {
-                    result += "═";
-                }
-                result += "╩";
-            }
-            for (int i = 0; i < maxColumnSize; i++) {
-                result += "═";
-            }
-            result += "╝\n";
+            resultBld.append("╠");
+            getColumnData(resultBld, maxColumnSize, columnCount, "╬");
+            getMaxColumnData(resultBld, maxColumnSize, "═");
+            resultBld.append("╣\n");
         }
-        return result;
+        return resultBld.toString();
     }
 }

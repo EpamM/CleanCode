@@ -17,9 +17,10 @@ public class Formatter {
     }
 
     private String repeatSymbol(String symbol, int times) {
-        String result = "";
-        for (int i = 0; i < times; i++)
-            result += symbol;
-        return result;
+        StringBuilder bld = new StringBuilder();
+        for (int i = 0; i < times; ++i) {
+            bld.append(symbol);
+        }
+        return bld.toString();
     }
 }
